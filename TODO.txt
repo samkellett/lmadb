@@ -1,0 +1,30 @@
+episode 0:
+	- set up project
+
+episode 1:
+	- parser
+	- begin ast
+
+episode 2:
+	- c api
+	- python bindings
+	- python cli
+
+episode 3:
+	- table and column metadata file format
+	- implement create table
+
+episode 4:
+	- int64 column file format
+	- implement insert
+
+episode 5:
+	- query engine
+	- implement simple select
+
+future:
+	- sanitisers, clang-format, clang-tidy, coverage
+	- ci (and docker)
+	- fuzz testing
+	- parser error handling
+	- table/column autocompletion
