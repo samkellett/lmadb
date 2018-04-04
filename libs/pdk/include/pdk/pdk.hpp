@@ -408,11 +408,6 @@ constexpr auto operator|(A a, B b)
   };
 }
 
-//   *A        : matches parser A zero or more times,
-//   +A        : matches parser A one or more times,
-//   A % B     : matches parser A one or more times, interwoven with parser B.
-//
-
 template <typename A>
 constexpr auto operator+(A a)
 {
