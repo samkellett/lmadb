@@ -9,3 +9,6 @@ function(add_unit_test)
 	target_link_libraries(${LMADB_TEST_NAME} ${LMADB_TEST_LIBRARIES})
 	add_test(NAME ${LMADB_TEST_NAME} COMMAND ${LMADB_TEST_NAME})
 endfunction()
+
+add_subdirectory(cxx)
+add_subdirectory(pdk)

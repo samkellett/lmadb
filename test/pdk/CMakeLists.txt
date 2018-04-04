@@ -1,0 +1,1 @@
+add_unit_test(GTEST NAME test_pdk SOURCES test_pdk.cpp LIBRARIES lmadb::pdk)
