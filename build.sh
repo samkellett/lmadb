@@ -52,7 +52,7 @@ source "$VENV_DIR/bin/activate"
 
 pip install --upgrade pip
 pip install -r "$PROJECT_DIR/requirements.txt"
-pip freeze > "$PROJECT_DIR/requirements.txt"
+pip freeze | grep -v lmadb > "$PROJECT_DIR/requirements.txt"
 
 cmake "$PROJECT_DIR" \
 	-GNinja \
@@ -62,6 +62,8 @@ cmake "$PROJECT_DIR" \
 	-DCMAKE_C_COMPILER=clang
 
 ninja
+pip install $BUILD_DIR/libs/pylmadb
+
 ninja test
 
 [[ $VENV_LOADED == 1 ]] || echo "Run: source $VENV_DIR/bin/activate"

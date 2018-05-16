@@ -23,8 +23,9 @@ episode 5:
 	- implement simple select
 
 future:
-	- sanitisers, clang-format, clang-tidy, coverage
+	- sanitisers, lints, clang-format, clang-tidy, coverage
 	- ci (and docker)
 	- fuzz testing
 	- parser error handling
 	- table/column autocompletion
+	- work out a way to unit test private sources inside the internal libraries

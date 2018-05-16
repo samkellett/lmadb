@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+import argparse
+import atexit
+import pylmadb
+import os
+import shutil
+import tempfile
+
+from prompt_toolkit import prompt
+from prompt_toolkit.history import InMemoryHistory
+
+parser = argparse.ArgumentParser(description='LMADB command line client.')
+parser.add_argument('path', type=str, nargs='?', help='path to database')
+
+args = parser.parse_args()
+
+print('LMADB version {}'.format(pylmadb.__version__))
+
+if args.path is None:
+    # create a temporary database that is destroyed on exit.
+    tmpdir = tempfile.mkdtemp()
+    atexit.register(lambda: shutil.rmtree(tmpdir))
+
+    args.path = os.path.join(tmpdir, 'lmadb')
+    print('Connected to a transient database: {}'.format(args.path))
+
+conn = pylmadb.connection(args.path)
+
+history = InMemoryHistory()
+
+while True:
+    command = prompt('> ', history=history)
+    if command == 'quit' or command == 'q':
+        break
+
+    print(command)
