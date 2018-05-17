@@ -3,7 +3,7 @@ project(lmadb)
 
 include(CTest)
 
-find_package(Boost 1.66 REQUIRED)
+find_package(Boost 1.66 REQUIRED COMPONENTS system filesystem)
 
 enable_testing()
 

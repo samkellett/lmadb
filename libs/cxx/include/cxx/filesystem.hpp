@@ -1,11 +1,11 @@
 #ifndef LMADB_CXX_FILESYSTEM_HPP
 #define LMADB_CXX_FILESYSTEM_HPP
 
-#include <experimental/filesystem>
+#include <boost/filesystem.hpp>
 
 namespace lmadb::cxx {
 
-namespace filesystem = std::experimental::filesystem;
+namespace filesystem = boost::filesystem;
 
 } // namespace lmadb::cxx
 

@@ -544,32 +544,32 @@ TEST(KleenBoolsParser, MatchesNone)
   ASSERT_EQ(result->second, "1falsetrue!");
 }
 
-// TEST(CsvParser, MatchesOne)
-// {
-//   const auto input = "sam!";
-//   const auto result = csv_parser(input);
+TEST(CsvParser, MatchesOne)
+{
+  const auto input = "sam!";
+  const auto result = csv_parser(input);
 
-//   ASSERT_TRUE(result);
-//   ASSERT_THAT(result->first, ElementsAre("sam"));
-//   ASSERT_EQ(result->second, "!");
-// }
+  ASSERT_TRUE(result);
+  ASSERT_THAT(result->first, ElementsAre("sam"));
+  ASSERT_EQ(result->second, "!");
+}
 
-// TEST(CsvParser, MatchesTwo)
-// {
-//   const auto input = "sam, tom!";
-//   const auto result = csv_parser(input);
+TEST(CsvParser, MatchesTwo)
+{
+  const auto input = "sam, tom!";
+  const auto result = csv_parser(input);
 
-//   ASSERT_TRUE(result);
-//   ASSERT_THAT(result->first, ElementsAre("sam", "tom"));
-//   ASSERT_EQ(result->second, "!");
-// }
+  ASSERT_TRUE(result);
+  ASSERT_THAT(result->first, ElementsAre("sam", "tom"));
+  ASSERT_EQ(result->second, "!");
+}
 
-// TEST(CsvParser, MatchesNone)
-// {
-//   const auto input = "42, sam!";
-//   const auto result = csv_parser(input);
+TEST(CsvParser, MatchesNone)
+{
+  const auto input = "42, sam!";
+  const auto result = csv_parser(input);
 
-//   ASSERT_FALSE(result);
-// }
+  ASSERT_FALSE(result);
+}
 
 } // namespace my_namespace

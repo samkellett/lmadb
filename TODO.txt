@@ -9,6 +9,7 @@ episode 2:
 	- c api
 	- python bindings
 	- python cli
+	- build filecheck tool and test cli
 
 episode 3:
 	- table and column metadata file format

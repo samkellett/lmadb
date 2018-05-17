@@ -13,12 +13,6 @@ private:
   cxx::filesystem::path path_;
 };
 
-inline
-connection::connection(cxx::filesystem::path path) noexcept
-: path_{std::move(path)}
-{
-}
-
 } // namespace lmadb
 
 #endif // LMADB_CONNECTION_HPP

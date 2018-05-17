@@ -26,7 +26,6 @@ if args.path is None:
     print('Connected to a transient database: {}'.format(args.path))
 
 conn = pylmadb.connection(args.path)
-
 history = InMemoryHistory()
 
 while True:
