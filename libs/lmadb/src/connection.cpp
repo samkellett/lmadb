@@ -1,5 +1,7 @@
 #include "connection.hpp"
 
+#include "statement.hpp"
+
 namespace lmadb {
 
 connection::connection(cxx::filesystem::path path) noexcept
@@ -11,6 +13,12 @@ connection::connection(cxx::filesystem::path path) noexcept
   } else {
     // TODO: verify path points to a lmadb database.
   }
+}
+
+auto connection::create_statement(std::string_view sql)
+  -> std::unique_ptr<statement>
+{
+  return std::make_unique<statement>(path_, std::move(sql));
 }
 
 } // namespace lmadb

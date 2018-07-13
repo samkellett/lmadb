@@ -26,9 +26,11 @@ while getopts ":t:c" O; do
   esac
 done
 
+echo "Build Type: ${BUILD_TYPE}"
+echo "Clean Build: ${CLEAN}"
+
 BUILD_DIR="$PROJECT_DIR/$BUILD_TYPE"
 VENV_DIR="$BUILD_DIR/env"
-
 if [[ $CLEAN == 1 ]]; then
 	echo -n "Removing $BUILD_DIR... press 'y' to confirm: "
 	read CONFIRM
@@ -50,6 +52,8 @@ fi
 [[ -d "$VENV_DIR" ]] || virtualenv -p python3 --prompt "(lmadb-$BUILD_TYPE) " "$VENV_DIR"
 source "$VENV_DIR/bin/activate"
 
+[[ $VENV_LOADED == 1 ]] || echo "Run: source $VENV_DIR/bin/activate"
+
 pip install --upgrade pip
 pip install -r "$PROJECT_DIR/requirements.txt"
 pip freeze | grep -v lmadb > "$PROJECT_DIR/requirements.txt"
@@ -66,4 +70,3 @@ pip install $BUILD_DIR/libs/pylmadb
 
 ninja test
 
-[[ $VENV_LOADED == 1 ]] || echo "Run: source $VENV_DIR/bin/activate"

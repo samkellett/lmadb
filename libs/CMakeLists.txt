@@ -1,4 +1,6 @@
+add_subdirectory(ast)
 add_subdirectory(cxx)
 add_subdirectory(lmadb)
+add_subdirectory(meta)
 add_subdirectory(pdk)
 add_subdirectory(pylmadb)

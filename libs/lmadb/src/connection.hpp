@@ -3,11 +3,17 @@
 
 #include "cxx/filesystem.hpp"
 
+#include <string_view>
+
 namespace lmadb {
+
+class statement;
 
 class connection {
 public:
   explicit connection(cxx::filesystem::path path) noexcept;
+
+  auto create_statement(std::string_view sql) -> std::unique_ptr<statement>;
 
 private:
   cxx::filesystem::path path_;

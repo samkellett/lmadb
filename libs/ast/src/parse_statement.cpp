@@ -1,8 +1,9 @@
-#include "parse_statement.hpp"
+#include "ast/parse_statement.hpp"
 
 #include "pdk/pdk.hpp"
 
 namespace lmadb {
+namespace parser {
 
 using namespace lmadb::pdk;
 using namespace lmadb::pdk::literals;
@@ -25,9 +26,13 @@ constexpr auto create_table_statement
 constexpr auto sql_statement
   = create_table_statement > ";"_lit;
 
+} // namespace parser
+
+namespace ast {
+
 auto parse_statement(const std::string_view sql) -> std::optional<ast::sql_statement>
 {
-  if (auto result = sql_statement(sql)) {
+  if (auto result = parser::sql_statement(sql)) {
     // discard the unparsed input.
     return result->first;
   } else {
@@ -35,4 +40,5 @@ auto parse_statement(const std::string_view sql) -> std::optional<ast::sql_state
   }
 }
 
+} // namespace ast
 } // namespace lmadb
