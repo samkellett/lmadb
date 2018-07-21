@@ -13,7 +13,7 @@
 
 #define CHECK(pred)                                                   \
   if (!(pred)) {                                                      \
-    printf("line %d: predicate \"" #pred "\" not true.\n", __LINE__); \
+    printf("line %d: predicate \"%s\" not true.\n", __LINE__, #pred); \
     pass = false;                                                     \
     goto cleanup;                                                     \
   }
@@ -21,7 +21,7 @@
 #define CHECK_API_CALL_RC(fn, expected)                               \
   rc = fn;                                                            \
   if (rc != expected) {                                               \
-    printf("line %d: api call " #fn " returned %d.\n", __LINE__, rc); \
+    printf("line %d: api call %s returned %d.\n", __LINE__, #fn, rc); \
     pass = false;                                                     \
     goto cleanup;                                                     \
   }
@@ -42,6 +42,7 @@ int main()
   lmadb_connection *conn = NULL;
   lmadb_stmt *stmt = NULL;
   lmadb_table_list *tables = NULL;
+  lmadb_table_desc *table_desc = NULL;
 
   const char *sql = NULL;
 
@@ -49,6 +50,7 @@ int main()
   CHECK_API_CALL(lmadb_close(conn));
   CHECK_API_CALL(lmadb_finalize(stmt));
   CHECK_API_CALL(lmadb_free_table_list(tables));
+  CHECK_API_CALL(lmadb_free_table_desc(table_desc));
 
   // create a temporary directory to store our test db in.
   char template[] = "/tmp/lmadb-XXXXXX";
@@ -106,10 +108,17 @@ int main()
   CHECK_API_CALL(lmadb_free_table_list(tables));
   tables = NULL;
 
-  // TODO: replace this test with "list tables/columns" commands when they exist,
-  // including better tests (ie. checking the metadata content is correct).
-  CHECK(access("foo.columns", F_OK) != -1);
+  printf("describe table foo\n");
+  CHECK_API_CALL(lmadb_describe_table(conn, "foo", &table_desc));
+  CHECK(table_desc != NULL);
+  CHECK(table_desc->size == 1);
+  CHECK(table_desc->columns != NULL && table_desc->types != NULL);
+  CHECK(strcmp(table_desc->columns[0], "id") == 0);
+  CHECK(strcmp(table_desc->types[0], "int8") == 0);
+  CHECK_API_CALL(lmadb_free_table_desc(table_desc));
+  table_desc = NULL;
 
+  // TODO: these tests don't belong here.
   // check we can't create a table with the same name.
   {
     printf("can't create duplicate table\n");
@@ -149,6 +158,7 @@ cleanup:
   CHECK_API_CALL(lmadb_finalize(stmt));
   CHECK_API_CALL(lmadb_close(conn));
   CHECK_API_CALL(lmadb_free_table_list(tables));
+  CHECK_API_CALL(lmadb_free_table_desc(table_desc));
 
   CHECK(rmdir(dir) == -1);
   return pass ? 0 : 1;

@@ -3,6 +3,8 @@
 #include "connection.hpp"
 #include "statement.hpp"
 
+#include <boost/range/algorithm/copy.hpp>
+
 auto lmadb_open(const char *path, lmadb_connection **conn) -> lmadb_rc
 {
   if (!path || !conn) {
@@ -86,7 +88,7 @@ auto lmadb_list_tables(lmadb_connection *conn, lmadb_table_list **table_list)
 
   for (std::size_t i = 0; i < tables.size(); ++i) {
     char *name = new char[tables[i].size()];
-    std::copy(std::begin(tables[i]), std::end(tables[i]), name);
+    boost::copy(tables[i], name);
 
     (*table_list)->names[i] = name;
   }
@@ -101,7 +103,26 @@ auto lmadb_describe_table(lmadb_connection *conn, const char *table, lmadb_table
     return LMADB_ERROR;
   }
 
-  return LMADB_ERROR;
+  auto &connection{*reinterpret_cast<lmadb::connection *>(conn)};
+  const auto table_desc = connection.describe_table(table);
+
+  // No exception/memory safety here... but this is a tempoary method.
+  char **column_array = new char*[table_desc.size()];
+  char **type_array = new char*[table_desc.size()];
+  *desc = new lmadb_table_desc{column_array, type_array, table_desc.size()};
+
+  for (std::size_t i = 0; i < table_desc.size(); ++i) {
+    char *column = new char[table_desc[i].first.size()];
+    char *type = new char[table_desc[i].second.size()];
+
+    boost::copy(table_desc[i].first, column);
+    boost::copy(table_desc[i].second, type);
+
+    (*desc)->columns[i] = column;
+    (*desc)->types[i] = type;
+  }
+
+  return LMADB_OK;
 }
 
 auto lmadb_free_table_list(lmadb_table_list *tables) -> lmadb_rc

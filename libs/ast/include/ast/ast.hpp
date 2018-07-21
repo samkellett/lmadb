@@ -5,7 +5,8 @@
 #include <variant>
 #include <vector>
 
-namespace lmadb::ast {
+namespace lmadb {
+namespace ast {
 
 enum class type {
   int64
@@ -35,6 +36,19 @@ inline auto operator==(const create_table &lhs, const create_table &rhs) -> bool
   return lhs.name == rhs.name && lhs.columns == rhs.columns;
 }
 
-} // namespace lmadb::ast
+} // namespace ast
+
+namespace cxx {
+
+inline auto to_string_view(ast::type type) -> std::string_view
+{
+  switch(type) {
+    // TODO: this sucks, should rename the int64 enum.
+    case ast::type::int64: return "int8";
+  }
+}
+
+} // namespace cxx
+} // namespace lmadb
 
 #endif // LMADB_AST_HPP

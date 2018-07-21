@@ -29,4 +29,11 @@ auto connection::list_tables() const -> std::vector<std::string>
   return reader.list_tables();
 }
 
+auto connection::describe_table(std::string_view table) const
+  -> std::vector<std::pair<std::string, std::string_view>>
+{
+  const meta::reader reader{path_};
+  return reader.describe_table(std::move(table));
+}
+
 } // namespace lmadb
