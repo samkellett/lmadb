@@ -1,4 +1,5 @@
 add_library(meta
+	src/reader.cpp
 	src/writer.cpp
 )
 

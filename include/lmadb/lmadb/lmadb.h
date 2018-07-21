@@ -1,6 +1,8 @@
 #ifndef LMADB_LMADB_H
 #define LMADB_LMADB_H
 
+#include <stddef.h>
+
 // Public C API for LMADB, based off of the sqlite3 C interface.
 
 #ifdef __cplusplus
@@ -43,6 +45,29 @@ lmadb_rc lmadb_finalize(lmadb_stmt *stmt);
 // Calling this function after a statement is finished is an error. If data is
 // returned then this function will return LMADB_ROW.
 lmadb_rc lmadb_step(lmadb_stmt *stmt);
+
+// These API methods are a tempoary way to query the structure of the database
+// and the tables inside it. Eventually these will be removed and this
+// functionality will be available via the prepare/step interface.
+typedef struct {
+  // An array of zero-terminated table names.
+  char **names;
+  size_t size;
+} lmadb_table_list;
+
+typedef struct {
+  // Two arrays that container zero-terminated column names and type names for
+  // each column in a table.
+  char **columns;
+  char **types;
+  size_t size;
+} lmadb_table_desc;
+
+lmadb_rc lmadb_list_tables(lmadb_connection *conn, lmadb_table_list **tables);
+lmadb_rc lmadb_describe_table(lmadb_connection *conn, const char *table, lmadb_table_desc **desc);
+
+lmadb_rc lmadb_free_table_list(lmadb_table_list *tables);
+lmadb_rc lmadb_free_table_desc(lmadb_table_desc *desc);
 
 #ifdef __cplusplus
 } // extern "C"

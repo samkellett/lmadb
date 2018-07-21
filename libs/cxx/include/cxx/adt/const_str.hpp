@@ -13,8 +13,10 @@ class const_str {
 public:
   const_str(std::string_view str);
 
-  auto operator==(const const_str &other) const;
-  auto operator<(const const_str &other) const;
+  auto string() const -> std::string;
+
+  auto operator==(const const_str &other) const -> bool;
+  auto operator<(const const_str &other) const -> bool;
 
 private:
   std::array<char, N> data_;
@@ -32,13 +34,19 @@ const_str<N>::const_str(const std::string_view str)
 }
 
 template <std::size_t N>
-auto const_str<N>::operator==(const const_str<N> &other) const
+auto const_str<N>::string() const -> std::string
+{
+  return std::string{data_.data(), N};
+}
+
+template <std::size_t N>
+auto const_str<N>::operator==(const const_str<N> &other) const -> bool
 {
   return data_ == other.data_;
 }
 
 template <std::size_t N>
-auto const_str<N>::operator<(const const_str<N> &other) const
+auto const_str<N>::operator<(const const_str<N> &other) const -> bool
 {
   return std::string_view{data_.data(), N} < std::string_view{other.data_.data(), N};
 }
