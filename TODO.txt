@@ -19,6 +19,10 @@ episode 4:
 	- plug everything so far into the cli
 	- write a file check tool to test the cli
 
+episode 4a:
+	- handle multi-line queries in the cli
+	- propagate exception error messages through c api.
+
 episode 5:
 	- int64 column file format
 	- implement insert
@@ -27,13 +31,13 @@ episode 6:
 	- query engine
 	- implement simple select
 
-episode 6a:
+episode 7:
 	- add pseudo tables for listing and describing tables
 	- replace list_table and describe_table api methods
 
 future:
 	- sanitisers, lints, clang-format, clang-tidy, coverage
-	- profile guided optmisation
+	- profile guided optmisation and lto
 	- ci (and docker)
 	- fuzz testing
 	- parser error handling
