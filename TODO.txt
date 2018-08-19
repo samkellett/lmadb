@@ -36,7 +36,7 @@ episode 7:
 	- replace list_table and describe_table api methods
 
 future:
-	- sanitisers, lints, clang-format, clang-tidy, coverage
+	- sanitisers, lints, clang-format, clang-tidy, coverage, pep8
 	- profile guided optmisation and lto
 	- ci (and docker)
 	- fuzz testing

@@ -33,9 +33,10 @@ namespace ast {
 auto parse_statement(const std::string_view sql) -> std::optional<ast::sql_statement>
 {
   if (auto result = parser::sql_statement(sql)) {
-    // discard the unparsed input.
+    // TODO: don't discard the unparsed input.
     return result->first;
   } else {
+    // TODO: return parse error information.
     return std::nullopt;
   }
 }

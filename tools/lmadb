@@ -25,8 +25,22 @@ def handle_meta_command(conn, command, args):
     else:
         raise RuntimeError('unknown meta command .{}'.format(command))
 
+def handle_command(conn, command):
+    try:
+        if command.startswith('.'):
+            args = command.split(' ')
+            handle_meta_command(conn, command=args[0][1:], args=args[1:])
+        else:
+            stmt = conn.prepare(command)
+            for row in stmt:
+                print(row)
+    # TODO: this should be our own error type.
+    except RuntimeError as e:
+        print('Error: {}'.format(e))
+
 parser = argparse.ArgumentParser(description='LMADB command line client.')
 parser.add_argument('path', type=str, nargs='?', help='path to database')
+parser.add_argument('-s', '--script', help='SQL script to process')
 
 args = parser.parse_args()
 
@@ -41,24 +55,25 @@ if args.path is None:
     print('Connected to a transient database: {}'.format(args.path))
 
 conn = pylmadb.connection(args.path)
-history = InMemoryHistory()
 
-while True:
-    command = prompt('> ', history=history)
-    if len(command) == 0:
-        continue
+if args.script:
+    with open(args.script, 'r') as f:
+        for line in f:
+            # skip comments and blank lines.
+            line = line.strip()
+            if len(line) == 0 or line.startswith(';'):
+                continue
 
-    if command == 'quit' or command == 'q':
-        break
+            handle_command(conn, line)
+else:
+    history = InMemoryHistory()
 
-    try:
-        if command.startswith('.'):
-            args = command.split(' ')
-            handle_meta_command(conn, command=args[0][1:], args=args[1:])
-        else:
-            stmt = conn.prepare(command)
-            for row in stmt:
-                print(row)
-    # TODO: this should be our own error type.
-    except RuntimeError as e:
-        print('Error: {}'.format(e))
+    while True:
+        command = prompt('> ', history=history)
+        if len(command) == 0:
+            continue
+
+        if command == 'quit' or command == 'q':
+            break
+
+        handle_command(conn, command)

@@ -1,0 +1,85 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import re
+import shlex
+import subprocess
+import sys
+
+from collections import namedtuple
+
+# Inspired by LLVM's lit and FileCheck programs.
+
+# Takes a file as an argument which is parsed for directives:
+#    RUN - executes the command stated and checks the output from stdout against the checks in this file.
+#    CHECK - runs a regular expression against the output of a RUN command.
+#    CHECK-NEXT - same as above but must come the line after the previous CHECK.
+#
+# Each directive is written as a comment, comment tokens supported:
+#    #, ;
+#
+# The RUN command supports the following substitutions:
+#    %s - the full path of this file
+#    %% - a literal %
+
+run = namedtuple('run', ['command'])
+check = namedtuple('check', ['test', 'next'])
+
+directive = re.compile(r"^\s*(?:#|;)\s*(RUN|CHECK|CHECK-NEXT):\s*(.*)\s*$")
+
+parser = argparse.ArgumentParser(description='LMADB command line test tool.')
+parser.add_argument('path', type=os.path.abspath, help='test file to run')
+
+args = parser.parse_args()
+
+runs = []
+checks = []
+
+# Load the test file and parse it for directives.
+with open(args.path, 'r') as f:
+    for line in f:
+        m = directive.match(line)
+        if m:
+            com, value = m.groups()
+            if com == 'RUN':
+                value = value.replace('%s', args.path)
+                value = value.replace('%%', '%')
+
+                runs.append(run(command=shlex.split(value)))
+            elif com.startswith('CHECK'):
+                nxt = com == 'CHECK-NEXT'
+                checks.append(check(test=re.compile(value), next=nxt))
+
+# Execute each command, capturing stdout and running it through all the checks
+for r in runs:
+    # TODO: add verbose logging
+    print('executing: {}'.format(' '.join(r.command)))
+
+    out = subprocess.check_output(r.command).decode('utf-8')
+
+    # load the first check
+    check_iter = iter(checks)
+    current_check = next(check_iter, None)
+    for line in out.splitlines():
+        # if we've run out of checks we might as well stop.
+        if not current_check:
+            break
+
+        # if the next check is a CHECK-NEXT then this line must match, otherwise
+        # we can ignore it.
+        m = current_check.test.match(line)
+        if m:
+            # move onto the next check
+            current_check = next(check_iter, None)
+        elif current_check.next:
+            print('ERROR: could not satisfy check: {}'.format(current_check.test.pattern))
+            sys.exit(1)
+
+    # if we've run out of output but not exhausted all our checks we have failed.
+    if current_check:
+        print('ERROR: could not satisfy check: {}'.format(current_check.test.pattern))
+        sys.exit(1)
+
+# successful finish.
+sys.exit(0)

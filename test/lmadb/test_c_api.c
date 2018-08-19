@@ -118,41 +118,6 @@ int main()
   CHECK_API_CALL(lmadb_free_table_desc(table_desc));
   table_desc = NULL;
 
-  // TODO: these tests don't belong here.
-  // check we can't create a table with the same name.
-  {
-    printf("can't create duplicate table\n");
-    sql = "create table foo (a int8);";
-    CHECK_API_CALL(lmadb_prepare(conn, sql, strlen(sql), &stmt));
-    CHECK(stmt != NULL);
-    CHECK_API_CALL_RC(lmadb_step(stmt), LMADB_ERROR);
-
-    CHECK_API_CALL(lmadb_finalize(stmt));
-    stmt = NULL;
-
-    CHECK_API_CALL(lmadb_list_tables(conn, &tables));
-    CHECK(tables->size == 1);
-    CHECK_API_CALL(lmadb_free_table_list(tables));
-    tables = NULL;
-  }
-
-  // check we can't create a table with two columns that have the same name.
-  {
-    printf("can't create table with duplicate columns\n");
-    sql = "create table foo (id int8, id int8);";
-    CHECK_API_CALL(lmadb_prepare(conn, sql, strlen(sql), &stmt));
-    CHECK(stmt != NULL);
-    CHECK_API_CALL_RC(lmadb_step(stmt), LMADB_ERROR);
-
-    CHECK_API_CALL(lmadb_finalize(stmt));
-    stmt = NULL;
-
-    CHECK_API_CALL(lmadb_list_tables(conn, &tables));
-    CHECK(tables->size == 1);
-    CHECK_API_CALL(lmadb_free_table_list(tables));
-    tables = NULL;
-  }
-
 cleanup:
   printf("cleanup\n");
   CHECK_API_CALL(lmadb_finalize(stmt));

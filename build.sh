@@ -68,5 +68,6 @@ cmake "$PROJECT_DIR" \
 ninja
 pip install $BUILD_DIR/libs/pylmadb
 
+export CTEST_OUTPUT_ON_FAILURE=1
+export CTEST_PARALLEL_LEVEL=$(sysctl -n hw.ncpu)
 ninja test
-

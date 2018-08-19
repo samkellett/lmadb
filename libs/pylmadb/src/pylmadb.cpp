@@ -76,22 +76,22 @@ PYBIND11_MODULE(pylmadb, m) {
     ;
 
   py::class_<::lmadb_table_list, std::shared_ptr<::lmadb_table_list>>(m, "table_list")
-    .def("__getitem__", [](const std::shared_ptr<::lmadb_table_list> &tables, std::size_t idx) {
-      if (idx >= tables->size) {
+    .def("__getitem__", [](const ::lmadb_table_list &tables, std::size_t idx) {
+      if (idx >= tables.size) {
         throw pybind11::index_error{};
       }
 
-      return tables->names[idx];
+      return tables.names[idx];
     })
     ;
 
   py::class_<::lmadb_table_desc, std::shared_ptr<::lmadb_table_desc>>(m, "table_desc")
-    .def("__getitem__", [](const std::shared_ptr<::lmadb_table_desc> &desc, std::size_t idx) {
-      if (idx >= desc->size) {
+    .def("__getitem__", [](const ::lmadb_table_desc &desc, std::size_t idx) {
+      if (idx >= desc.size) {
         throw pybind11::index_error{};
       }
 
-      return std::make_pair(desc->columns[idx], desc->types[idx]);
+      return std::make_pair(desc.columns[idx], desc.types[idx]);
     })
     ;
 }
