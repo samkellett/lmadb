@@ -26,6 +26,7 @@ function(add_fcheck_test)
 		PROPERTIES ENVIRONMENT "PATH=${CMAKE_SOURCE_DIR}/tools:$ENV{PATH}")
 endfunction()
 
+add_subdirectory(ast)
 add_subdirectory(cxx)
 add_subdirectory(lmadb)
 add_subdirectory(pdk)

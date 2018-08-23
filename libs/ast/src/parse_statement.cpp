@@ -24,7 +24,7 @@ constexpr auto create_table_statement
   / construct<ast::create_table>;
 
 constexpr auto sql_statement
-  = create_table_statement > ";"_lit;
+  = ~(-space) > create_table_statement > ";"_lit;
 
 } // namespace parser
 

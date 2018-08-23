@@ -2,9 +2,11 @@
 
 import argparse
 import atexit
+import os
+import pathlib
 import platform
 import pylmadb
-import os
+import re
 import shutil
 import tempfile
 
@@ -28,7 +30,7 @@ def handle_meta_command(conn, command, args):
 def handle_command(conn, command):
     try:
         if command.startswith('.'):
-            args = command.split(' ')
+            args = command.partition('\n')[0].split(' ')
             handle_meta_command(conn, command=args[0][1:], args=args[1:])
         else:
             stmt = conn.prepare(command)
@@ -57,18 +59,17 @@ if args.path is None:
 conn = pylmadb.connection(args.path)
 
 if args.script:
-    with open(args.script, 'r') as f:
-        for line in f:
-            # skip comments and blank lines.
-            line = line.strip()
-            if len(line) == 0 or line.startswith(';'):
-                continue
+    # load script into memory, strip out all comments and then process each command
+    sql = pathlib.Path(args.script).read_text()
+    sql = re.sub(';.*\n', ';', sql)
 
-            handle_command(conn, line)
+    for command in (e+';' for e in sql.split(';') if e.strip()):
+        handle_command(conn, command)
 else:
     history = InMemoryHistory()
 
     while True:
+        # TODO: make this accept multiline interactive input.
         command = prompt('> ', history=history)
         if len(command) == 0:
             continue

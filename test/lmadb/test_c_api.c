@@ -69,11 +69,8 @@ int main()
   CHECK(conn != NULL);
 
   // make sure we have created our database.
-  CHECK(is_directory(path));
-
-  // move to that directory for ease of testing that files exist.
   printf("test database: %s\n", path);
-  CHECK(chdir(path) == 0);
+  CHECK(is_directory(path));
 
   // close and re-open the connection, making sure it didn't disappear.
   printf("close and reopen\n");

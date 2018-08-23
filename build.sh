@@ -56,6 +56,7 @@ source "$VENV_DIR/bin/activate"
 
 pip install --upgrade pip
 pip install -r "$PROJECT_DIR/requirements.txt"
+# TODO: this doesn't work when you install a new package.
 pip freeze | grep -v lmadb > "$PROJECT_DIR/requirements.txt"
 
 cmake "$PROJECT_DIR" \
