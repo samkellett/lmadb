@@ -21,6 +21,8 @@ set(LMADB_CXX_OPTIONS ${LMADB_STD_CXX} -stdlib=libc++)
 add_compile_options(
 	"$<$<COMPILE_LANGUAGE:CXX>:${LMADB_CXX_OPTIONS}>"
 	-fcolor-diagnostics
+	# TODO: see if this can be enabled.
+	# -Wl,--fatal-warnings
 	-Wall
 	-Wextra
 	-Werror

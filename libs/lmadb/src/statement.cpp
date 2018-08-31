@@ -17,11 +17,16 @@ public:
   {
   }
 
-  auto operator()(const ast::create_table &create_table)
+  auto operator()(const ast::create_table &create_table) -> step_status
   {
     meta::writer md{db_};
     md.create_table(create_table);
     return step_status::done;
+  }
+
+  auto operator()([[maybe_unused]] const ast::insert_into &insert_into) -> step_status
+  {
+    throw std::logic_error{"unimplemented."};
   }
 
 private:

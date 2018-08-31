@@ -17,15 +17,30 @@ struct column_def {
   type type;
 };
 
+using literal_value = std::variant<
+  std::int64_t
+>;
+
+using expr = std::variant<
+  literal_value
+>;
+
 struct create_table {
   std::string_view name;
   std::vector<column_def> columns;
 };
 
+struct insert_into {
+  std::string_view table;
+  std::vector<expr> values;
+};
+
 using sql_statement = std::variant<
-  create_table
+  create_table,
+  insert_into
 >;
 
+// TODO: make this process less manual.
 inline auto operator==(const column_def &lhs, const column_def &rhs) -> bool
 {
   return lhs.name == rhs.name && lhs.type == rhs.type;
@@ -35,6 +50,13 @@ inline auto operator==(const create_table &lhs, const create_table &rhs) -> bool
 {
   return lhs.name == rhs.name && lhs.columns == rhs.columns;
 }
+
+inline auto operator==(const insert_into &lhs, const insert_into &rhs) -> bool
+{
+  return lhs.table == rhs.table && lhs.values == rhs.values;
+}
+
+// TODO: some sort of printing (stream operators?).
 
 } // namespace ast
 

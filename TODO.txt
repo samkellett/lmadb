@@ -32,7 +32,12 @@ episode 6:
 	- implement simple select
 
 episode 7:
+	- add support for a simple where clause with a single equality predicate
+
+episode 8:
 	- add pseudo tables for listing and describing tables
+		* `SELECT * FROM lmadb.tables`
+		* `SELECT * FROM lmadb.schema WHERE name = 'foo'`
 	- replace list_table and describe_table api methods
 
 future:

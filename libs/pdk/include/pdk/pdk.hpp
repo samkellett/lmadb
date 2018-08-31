@@ -226,6 +226,7 @@ const auto from_chars_helper = [](std::string_view str) -> T
 } // namespace detail
 
 constexpr auto int32 = digit / detail::from_chars_helper<std::int32_t>;
+constexpr auto int64 = digit / detail::from_chars_helper<std::int64_t>;
 
 template <typename P>
 constexpr auto operator~(P p)

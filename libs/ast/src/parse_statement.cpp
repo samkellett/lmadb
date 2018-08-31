@@ -19,13 +19,27 @@ constexpr auto type_name
 constexpr auto column_def
   = (column_name > type_name) / construct<ast::column_def>;
 
+constexpr auto literal_value
+  = int64
+  / construct<ast::literal_value>;
+
+constexpr auto expr
+  = literal_value
+  / construct<ast::expr>;
+
 constexpr auto create_table_statement
   = ("create"_ilit > "table"_ilit > table_name > "("_lit > (column_def % ","_lit) > ")"_lit)
   / construct<ast::create_table>;
 
+constexpr auto insert_into_statement
+  = ("insert"_ilit > "into"_ilit > table_name > "values"_ilit > "("_ilit > (expr % ","_lit) > ")"_lit)
+  / construct<ast::insert_into>;
+
 constexpr auto sql_statement
-  = ~(-space) > create_table_statement
-  ;
+  = ~(-space) >
+  ( create_table_statement
+  | insert_into_statement
+  );
 
 } // namespace parser
 

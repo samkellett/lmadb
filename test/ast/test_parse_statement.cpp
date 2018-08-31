@@ -5,7 +5,7 @@
 namespace ast = lmadb::ast;
 
 TEST(SqlStatement, CreateTableOneColumn) {
-  const auto uut = lmadb::ast::parse_statement("create table foo (id int8);");
+  const auto uut = lmadb::ast::parse_statement("create table foo (id int8)");
   ast::sql_statement expected = ast::create_table{"foo", {
     {"id", ast::type::int64}
   }};
@@ -18,11 +18,18 @@ TEST(SqlStatement, CreateTableTwoColumns) {
     create table foo (
       id int8,
       a int8
-    );)sql");
+    ))sql");
   ast::sql_statement expected = ast::create_table{"foo", {
     {"id", ast::type::int64},
     {"a", ast::type::int64}
   }};
+
+  ASSERT_EQ(uut.value(), expected);
+}
+
+TEST(SqlStatement, InsertInto) {
+  const auto uut = lmadb::ast::parse_statement("insert into foo values (1, 2, 3)");
+  ast::sql_statement expected = ast::insert_into{"foo", {1, 2, 3}};
 
   ASSERT_EQ(uut.value(), expected);
 }
