@@ -2,36 +2,75 @@
 
 #include <pybind11/pybind11.h>
 
-namespace py = pybind11;
-
 namespace {
 
-template <typename T, auto Constructor, auto Destructor>
-class wrapper {
+namespace py = pybind11;
+
+class connection_wrapper {
 public:
-  template <typename ...Args>
-  wrapper(Args&& ...args)
-  : ptr_{nullptr}
+  connection_wrapper(const char *path)
+  : conn_{nullptr}
   {
-    // TODO: error checking.
-    T *ptr;
-    Constructor(std::forward<Args>(args)..., &ptr);
-    ptr_ = std::shared_ptr<T>{ptr, Destructor};
+    ::lmadb_connection *conn;
+    const auto rc{::lmadb_open(path, &conn)};
+    switch(rc) {
+      case LMADB_OK: break;
+      case LMADB_ERROR:
+        assert(!conn && "Connection must still be NULL or it will leak.");
+        throw std::runtime_error{"Unable to create a connection."};
+      case LMADB_ROW:
+      case LMADB_DONE:
+        assert(false && "Unexpected return code.");
+    }
+    conn_ = std::shared_ptr<::lmadb_connection>{conn, ::lmadb_close};
   }
 
-  operator T *() const {
-    return ptr_.get();
+  operator ::lmadb_connection *() const {
+    return conn_.get();
   }
 
 private:
-  std::shared_ptr<T> ptr_;
+  std::shared_ptr<::lmadb_connection> conn_;
 };
 
-using connection_wrapper = wrapper<::lmadb_connection, ::lmadb_open, ::lmadb_close>;
-using statement_wrapper = wrapper<::lmadb_stmt, ::lmadb_prepare, ::lmadb_finalize>;
+class statement_wrapper {
+public:
+  statement_wrapper(lmadb_connection *conn, const char *sql, size_t length)
+  : conn_{conn},
+    stmt_{nullptr}
+  {
+    ::lmadb_stmt *stmt;
+    assert(length <= std::numeric_limits<int>::max());
+    const auto rc{::lmadb_prepare(conn, sql, static_cast<int>(length), &stmt)};
+    switch(rc) {
+      case LMADB_OK: break;
+      case LMADB_ERROR:
+        throw std::runtime_error{error()};
+      case LMADB_ROW:
+      case LMADB_DONE:
+        assert(false && "Unexpected return code.");
+    }
+    stmt_ = std::shared_ptr<::lmadb_stmt>{stmt, ::lmadb_finalize};
+  }
+
+  operator ::lmadb_stmt *() const {
+    return stmt_.get();
+  }
+
+  auto error() const -> const char * {
+    return ::lmadb_errmsg(conn_);
+  }
+
+private:
+  // need to keep hold of the connection pointer to call lmadb_errmsg.
+  ::lmadb_connection *conn_;
+  std::shared_ptr<::lmadb_stmt> stmt_;
+};
 
 } // unnamed namespace
 
+// TODO: explore setting a python exception without rethrowing. also use our
+// own exception types.
 PYBIND11_MODULE(pylmadb, m) {
   m.attr("__version__") = "dev";
   m.doc() = "Python bindings for LMADB.";
@@ -69,8 +108,7 @@ PYBIND11_MODULE(pylmadb, m) {
           assert(false);
           break;
         case LMADB_ERROR:
-          // TODO: provide an appropriate error string here.
-          throw std::runtime_error{"internal error"};
+          throw std::runtime_error{stmt.error()};
       }
     })
     ;

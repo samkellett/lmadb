@@ -46,6 +46,11 @@ lmadb_rc lmadb_finalize(lmadb_stmt *stmt);
 // returned then this function will return LMADB_ROW.
 lmadb_rc lmadb_step(lmadb_stmt *stmt);
 
+// Get an error string that describes the most recently occuring error. The
+// pointer returned is managed internally and if another error occurs this
+// value will change.
+const char *lmadb_errmsg(lmadb_connection *conn);
+
 // These API methods are a tempoary way to query the structure of the database
 // and the tables inside it. Eventually these will be removed and this
 // functionality will be available via the prepare/step interface.

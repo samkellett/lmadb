@@ -61,10 +61,13 @@ conn = pylmadb.connection(args.path)
 if args.script:
     # load script into memory, strip out all comments and then process each command
     sql = pathlib.Path(args.script).read_text()
+    # TODO: this won't work for semicolons in quoted strings.
     sql = re.sub(';.*\n', ';', sql)
 
-    for command in (e+';' for e in sql.split(';') if e.strip()):
-        handle_command(conn, command)
+    for command in (e.strip() for e in sql.split(';')):
+        # skip empty lines.
+        if command:
+            handle_command(conn, command)
 else:
     history = InMemoryHistory()
 

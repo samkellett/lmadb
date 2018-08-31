@@ -31,17 +31,20 @@ auto lmadb_prepare(lmadb_connection *conn, const char *sql, int length, lmadb_st
   -> lmadb_rc
 {
   if (!conn || !sql || !stmt) {
+    // TODO: use set_error when possible here.
     return LMADB_ERROR;
   }
 
+  auto &connection{*reinterpret_cast<lmadb::connection *>(conn)};
+
   try {
-    auto &connection{*reinterpret_cast<lmadb::connection *>(conn)};
     auto statement = connection.create_statement({sql, static_cast<std::size_t>(length)});
 
     *stmt = reinterpret_cast<lmadb_stmt *>(statement.release());
     return LMADB_OK;
-  } catch([[maybe_unused]] const std::exception &what) {
+  } catch(const std::exception &e) {
     // TODO: use our own exception types.
+    connection.set_error(e.what());
     return LMADB_ERROR;
   }
 }
@@ -58,18 +61,25 @@ auto lmadb_step(lmadb_stmt *stmt) -> lmadb_rc
     return LMADB_ERROR;
   }
 
+  auto &statement{*reinterpret_cast<lmadb::statement *>(stmt)};
   try {
     using lmadb::step_status;
 
-    auto &statement{*reinterpret_cast<lmadb::statement *>(stmt)};
     switch(statement.step()) {
       case step_status::row: return LMADB_ROW;
       case step_status::done: return LMADB_DONE;
     }
-  } catch([[maybe_unused]] const std::exception &what) {
+  } catch(const std::exception &e) {
     // TODO: use our own exception types.
+    statement.set_error(e.what());
     return LMADB_ERROR;
   }
+}
+
+auto lmadb_errmsg(lmadb_connection *conn) -> const char *
+{
+  auto &connection{*reinterpret_cast<lmadb::connection *>(conn)};
+  return connection.error().c_str();
 }
 
 auto lmadb_list_tables(lmadb_connection *conn, lmadb_table_list **table_list)

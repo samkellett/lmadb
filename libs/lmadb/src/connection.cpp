@@ -20,7 +20,9 @@ connection::connection(cxx::filesystem::path path) noexcept
 auto connection::create_statement(std::string_view sql)
   -> std::unique_ptr<statement>
 {
-  return std::make_unique<statement>(path_, std::move(sql));
+  return std::make_unique<statement>(path_, std::move(sql), [this](const std::string_view error) {
+    set_error(error);
+  });
 }
 
 auto connection::list_tables() const -> std::vector<std::string>
@@ -34,6 +36,16 @@ auto connection::describe_table(std::string_view table) const
 {
   const meta::reader reader{path_};
   return reader.describe_table(std::move(table));
+}
+
+auto connection::error() const -> const std::string &
+{
+  return error_;
+}
+
+auto connection::set_error(std::string_view msg) -> void
+{
+  error_ = msg;
 }
 
 } // namespace lmadb

@@ -82,6 +82,7 @@ int main()
   sql = "hello world;";
   CHECK_API_CALL_RC(lmadb_prepare(conn, sql, strlen(sql), &stmt), LMADB_ERROR);
   CHECK(stmt == NULL);
+  CHECK(strcmp(lmadb_errmsg(conn), "invalid SQL: 'hello world;'.") == 0);
 
   // create a table in our database.
   printf("create table foo\n");

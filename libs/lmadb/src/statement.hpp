@@ -5,6 +5,7 @@
 
 #include "ast/ast.hpp"
 
+#include <functional>
 #include <string>
 #include <string_view>
 
@@ -22,15 +23,21 @@ enum class step_status : bool {
 
 class statement {
 public:
-  statement(const cxx::filesystem::path &db, std::string_view sql);
+  statement(const cxx::filesystem::path &db,
+            std::string_view sql,
+            std::function<void(std::string_view)> set_error_callback);
 
   auto step() -> step_status;
+
+  auto set_error(std::string_view msg) -> void;
 
 private:
   const cxx::filesystem::path &db_;
 
   std::string query_string_;
   ast::sql_statement stmt_;
+
+  std::function<void(std::string_view)> set_error_callback_;
 };
 
 } // namespace lmadb
