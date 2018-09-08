@@ -1,6 +1,8 @@
 #ifndef LMADB_AST_HPP
 #define LMADB_AST_HPP
 
+#include "cxx/to_tuple.hpp"
+
 #include <string_view>
 #include <variant>
 #include <vector>
@@ -40,21 +42,19 @@ using sql_statement = std::variant<
   insert_into
 >;
 
-// TODO: make this process less manual.
-inline auto operator==(const column_def &lhs, const column_def &rhs) -> bool
-{
-  return lhs.name == rhs.name && lhs.type == rhs.type;
-}
+#define LMADB_DEFINE_EQ_OPS(ty)                                 \
+  inline auto operator==(const ty &lhs, const ty &rhs) -> bool { \
+    return cxx::to_tuple(lhs) == cxx::to_tuple(rhs);             \
+  }                                                              \
+  inline auto operator!=(const ty &lhs, const ty &rhs) -> bool { \
+    return !(lhs == rhs);                                        \
+  }
 
-inline auto operator==(const create_table &lhs, const create_table &rhs) -> bool
-{
-  return lhs.name == rhs.name && lhs.columns == rhs.columns;
-}
+LMADB_DEFINE_EQ_OPS(column_def)
+LMADB_DEFINE_EQ_OPS(create_table)
+LMADB_DEFINE_EQ_OPS(insert_into)
 
-inline auto operator==(const insert_into &lhs, const insert_into &rhs) -> bool
-{
-  return lhs.table == rhs.table && lhs.values == rhs.values;
-}
+#undef LMADB_DEFINE_EQ_OPS
 
 // TODO: some sort of printing (stream operators?).
 

@@ -36,18 +36,19 @@ constexpr auto insert_into_statement
   / construct<ast::insert_into>;
 
 constexpr auto sql_statement
-  = ~(-space) >
-  ( create_table_statement
+  = create_table_statement
   | insert_into_statement
-  );
+  ;
 
 } // namespace parser
 
 namespace ast {
 
-auto parse_statement(const std::string_view sql) -> std::optional<ast::sql_statement>
+auto parse_statement(std::string_view sql) -> std::optional<ast::sql_statement>
 {
-  if (auto result = parser::sql_statement(sql)) {
+  // strip initial whitespace.
+  sql = sql.substr(sql.find_first_not_of(" \n\r\t"));
+  if (const auto result = parser::sql_statement(sql)) {
     // TODO: don't discard the unparsed input.
     return result->first;
   } else {

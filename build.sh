@@ -54,8 +54,8 @@ source "$VENV_DIR/bin/activate"
 
 [[ $VENV_LOADED == 1 ]] || echo "Run: source $VENV_DIR/bin/activate"
 
-pip install --upgrade pip
-pip install -r "$PROJECT_DIR/requirements.txt"
+pip install --retries 1 --timeout 5 --upgrade pip
+pip install --retries 1 --timeout 5 -r "$PROJECT_DIR/requirements.txt"
 # TODO: this doesn't work when you install a new package.
 pip freeze | grep -v lmadb > "$PROJECT_DIR/requirements.txt"
 

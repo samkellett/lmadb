@@ -5,6 +5,8 @@ add_library(ast
 add_library(lmadb::ast ALIAS ast)
 
 target_link_libraries(ast
+	PUBLIC
+		lmadb::cxx
 	PRIVATE
 		lmadb::pdk
 )
