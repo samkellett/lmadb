@@ -11,20 +11,24 @@
 #error "Test should be compiled as C."
 #endif
 
-#define CHECK(pred)                                                   \
-  if (!(pred)) {                                                      \
-    printf("line %d: predicate \"%s\" not true.\n", __LINE__, #pred); \
-    pass = false;                                                     \
-    goto cleanup;                                                     \
-  }
+#define CHECK(pred)                                                     \
+  do {                                                                  \
+    if (!(pred)) {                                                      \
+      printf("line %d: predicate \"%s\" not true.\n", __LINE__, #pred); \
+      pass = false;                                                     \
+      goto cleanup;                                                     \
+    }                                                                   \
+  } while (false)
 
-#define CHECK_API_CALL_RC(fn, expected)                               \
-  rc = fn;                                                            \
-  if (rc != expected) {                                               \
-    printf("line %d: api call %s returned %d.\n", __LINE__, #fn, rc); \
-    pass = false;                                                     \
-    goto cleanup;                                                     \
-  }
+#define CHECK_API_CALL_RC(fn, expected)                                 \
+  do {                                                                  \
+    lmadb_rc rc = fn;                                                   \
+    if (rc != expected) {                                               \
+      printf("line %d: api call %s returned %d.\n", __LINE__, #fn, rc); \
+      pass = false;                                                     \
+      goto cleanup;                                                     \
+    }                                                                   \
+  } while (false)
 
 #define CHECK_API_CALL(fn) CHECK_API_CALL_RC(fn, LMADB_OK)
 
@@ -38,7 +42,6 @@ int main()
 {
   bool pass = true;
 
-  lmadb_rc rc;
   lmadb_connection *conn = NULL;
   lmadb_stmt *stmt = NULL;
   lmadb_table_list *tables = NULL;
@@ -60,7 +63,7 @@ int main()
   char path[sizeof(template) + 6];
   {
     int written = snprintf(path, sizeof(path), "%s/lmadb", dir);
-    CHECK(written >= 0 && written < (int) sizeof(path))
+    CHECK(written >= 0 && written < (int) sizeof(path));
   }
 
   // check we can open a new database.

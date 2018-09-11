@@ -37,6 +37,7 @@ private:
   std::string query_string_;
   ast::sql_statement stmt_;
 
+  // TODO: make this a small_function
   std::function<void(std::string_view)> set_error_callback_;
 };
 

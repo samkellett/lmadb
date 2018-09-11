@@ -40,6 +40,9 @@ public:
   auto begin() const noexcept -> const_iterator;
   auto end() const noexcept -> const_iterator;
 
+  auto find(const key_type &) const -> const_iterator;
+  auto nth(size_type n) const -> const_iterator;
+
 private:
   boost::interprocess::managed_mapped_file file_;
   allocator alloc_;
@@ -83,6 +86,18 @@ template <typename Key, typename Value>
 auto persistent_flat_map<Key, Value>::end() const noexcept -> const_iterator
 {
   return map_->end();
+}
+
+template <typename Key, typename Value>
+auto persistent_flat_map<Key, Value>::find(const key_type &key) const -> const_iterator
+{
+  return map_->find(key);
+}
+
+template <typename Key, typename Value>
+auto persistent_flat_map<Key, Value>::nth(const size_type n) const -> const_iterator
+{
+  return map_->nth(n);
 }
 
 } // namespace lmadb::cxx

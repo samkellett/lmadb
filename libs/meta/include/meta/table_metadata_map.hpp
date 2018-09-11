@@ -6,11 +6,20 @@
 
 namespace lmadb::meta {
 
+class table_exists_error : public std::runtime_error {
+public:
+  table_exists_error(std::string what) : std::runtime_error{std::move(what)} {}
+};
+
 // TODO: make these newtypes.
 using table_id = std::uint32_t;
 using table_name = cxx::const_str<64>;
 
-using table_metadata_map = cxx::persistent_flat_map<table_name, table_id>;
+struct table_metadata {
+  table_id id;
+};
+
+using table_metadata_map = cxx::persistent_flat_map<table_name, table_metadata>;
 
 } // namespace lmadb::meta
 

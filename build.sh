@@ -3,15 +3,16 @@
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
-  echo "Usage: $0 [-t <release|debug>] [-c]" 1>&2
+  echo "Usage: $0 [-t <release|debug>] [-c] [-n]" 1>&2
   exit 0
 }
 
 # defaults
 BUILD_TYPE="debug"
 CLEAN=0
+TESTS=1
 
-while getopts ":t:c" O; do
+while getopts ":t:c:n" O; do
   case "$O" in
     t)
       BUILD_TYPE="$OPTARG"
@@ -19,6 +20,9 @@ while getopts ":t:c" O; do
       ;;
     c)
       CLEAN=1
+      ;;
+    n)
+      TESTS=0
       ;;
     *)
       usage
@@ -69,6 +73,8 @@ cmake "$PROJECT_DIR" \
 ninja
 pip install $BUILD_DIR/libs/pylmadb
 
-export CTEST_OUTPUT_ON_FAILURE=1
-export CTEST_PARALLEL_LEVEL=$(sysctl -n hw.ncpu)
-ninja test
+if [[ $TESTS == 1 ]]; then
+  export CTEST_OUTPUT_ON_FAILURE=1
+  export CTEST_PARALLEL_LEVEL=$(sysctl -n hw.ncpu)
+  ninja test
+fi

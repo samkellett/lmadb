@@ -10,16 +10,21 @@
 namespace lmadb {
 namespace ast {
 
+using table = std::string_view;
+using column = std::string_view;
+
 enum class type {
+  bool_,
   int64
 };
 
 struct column_def {
-  std::string_view name;
+  column name;
   type type;
 };
 
 using literal_value = std::variant<
+  bool,
   std::int64_t
 >;
 
@@ -28,12 +33,12 @@ using expr = std::variant<
 >;
 
 struct create_table {
-  std::string_view name;
+  table name;
   std::vector<column_def> columns;
 };
 
 struct insert_into {
-  std::string_view table;
+  table table;
   std::vector<expr> values;
 };
 
@@ -42,7 +47,7 @@ using sql_statement = std::variant<
   insert_into
 >;
 
-#define LMADB_DEFINE_EQ_OPS(ty)                                 \
+#define LMADB_DEFINE_EQ_OPS(ty)                                  \
   inline auto operator==(const ty &lhs, const ty &rhs) -> bool { \
     return cxx::to_tuple(lhs) == cxx::to_tuple(rhs);             \
   }                                                              \
@@ -64,9 +69,12 @@ namespace cxx {
 
 inline auto to_string_view(ast::type type) -> std::string_view
 {
+  using ast::type;
+
   switch(type) {
+    case type::bool_: return "boolean";
     // TODO: this sucks, should rename the int64 enum.
-    case ast::type::int64: return "int8";
+    case type::int64: return "int8";
   }
 }
 

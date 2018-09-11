@@ -2,6 +2,10 @@
 
 #include "ast/parse_statement.hpp"
 
+// #include "storage/column/writer.hpp"
+#include "storage/column/validate.hpp"
+
+#include "meta/reader.hpp"
 #include "meta/writer.hpp"
 
 #include <fmt/format.h>
@@ -21,11 +25,26 @@ public:
   {
     meta::writer md{db_};
     md.create_table(create_table);
+
     return step_status::done;
   }
 
   auto operator()([[maybe_unused]] const ast::insert_into &insert_into) -> step_status
   {
+    // load metadata for table.
+    const auto table_desc{[&] {
+      const meta::reader md{db_};
+      return md.find_table(insert_into.table);
+    }()};
+
+    // validate statement.
+    storage::column::validate(insert_into, table_desc);
+
+    // // insert record.
+    // storage::column::insert(db_, insert_into);
+
+    // return step_status::done;
+
     throw std::logic_error{"unimplemented."};
   }
 

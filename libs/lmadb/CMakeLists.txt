@@ -11,6 +11,7 @@ target_link_libraries(lmadb
 		lmadb::ast
 		lmadb::cxx
 		lmadb::meta
+		lmadb::storage
 		fmt::fmt
 )
 

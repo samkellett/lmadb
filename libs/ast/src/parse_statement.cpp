@@ -14,13 +14,19 @@ constexpr auto table_name
   = alpha;
 
 constexpr auto type_name
-  = "int8"_ilit / to<ast::type::int64>;
+  = "int8"_ilit / to<ast::type::int64>
+  | "boolean"_ilit / to<ast::type::bool_>;
 
 constexpr auto column_def
   = (column_name > type_name) / construct<ast::column_def>;
 
+constexpr auto bool_
+  = "true"_ilit / to<true>
+  | "false"_ilit / to<false>
+  ;
+
 constexpr auto literal_value
-  = int64
+  = (bool_ | int64)
   / construct<ast::literal_value>;
 
 constexpr auto expr

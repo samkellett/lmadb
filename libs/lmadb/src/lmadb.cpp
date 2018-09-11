@@ -97,7 +97,7 @@ auto lmadb_list_tables(lmadb_connection *conn, lmadb_table_list **table_list)
   *table_list = new lmadb_table_list{name_array, tables.size()};
 
   for (std::size_t i = 0; i < tables.size(); ++i) {
-    char *name = new char[tables[i].size()];
+    char *name = new char[tables[i].size()+1];
     boost::copy(tables[i], name);
 
     (*table_list)->names[i] = name;
@@ -122,8 +122,8 @@ auto lmadb_describe_table(lmadb_connection *conn, const char *table, lmadb_table
   *desc = new lmadb_table_desc{column_array, type_array, table_desc.size()};
 
   for (std::size_t i = 0; i < table_desc.size(); ++i) {
-    char *column = new char[table_desc[i].first.size()];
-    char *type = new char[table_desc[i].second.size()];
+    char *column = new char[table_desc[i].first.size()+1];
+    char *type = new char[table_desc[i].second.size()+1];
 
     boost::copy(table_desc[i].first, column);
     boost::copy(table_desc[i].second, type);

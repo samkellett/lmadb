@@ -7,16 +7,6 @@
 
 namespace lmadb::meta {
 
-class table_exists_error : public std::runtime_error {
-public:
-  table_exists_error(std::string what) : std::runtime_error{std::move(what)} {}
-};
-
-class column_exists_error : public std::runtime_error {
-public:
-  column_exists_error(std::string what) : std::runtime_error{std::move(what)} {}
-};
-
 // class that controls write access to the metadata.
 class writer {
 public:
