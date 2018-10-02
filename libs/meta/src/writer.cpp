@@ -27,7 +27,7 @@ auto writer::create_table(const ast::create_table &create_table) -> void
 
   try {
     // now insert the columns into a new map.
-    column_metadata_vector columns{db_ / fmt::format("{}.columns", table_name)};
+    column_metadata_vector columns{db_ / fmt::format("{}.columns", id)};
 
     // TODO: this is quadratic.
     for (const auto &column : create_table.columns) {

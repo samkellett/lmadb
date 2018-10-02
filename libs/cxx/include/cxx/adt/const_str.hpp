@@ -11,6 +11,8 @@ namespace lmadb::cxx {
 template <std::size_t N>
 class const_str {
 public:
+  template <size_t M>
+  const_str(const char(&str)[M]);
   const_str(std::string_view str);
 
   auto string() const -> std::string;
@@ -21,6 +23,15 @@ public:
 private:
   std::array<char, N> data_;
 };
+
+template <size_t N>
+template <size_t M>
+const_str<N>::const_str(const char(&str)[M])
+: data_{}
+{
+  static_assert(M <= N, "C string too large to fit in const_str.");
+  std::copy(std::begin(str), std::begin(str) + M, std::begin(data_));
+}
 
 template <std::size_t N>
 const_str<N>::const_str(const std::string_view str)

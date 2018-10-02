@@ -40,3 +40,10 @@ TEST(SqlStatement, InsertIntoBool) {
 
   ASSERT_EQ(uut.value(), expected);
 }
+
+TEST(SqlStatement, InsertIntoMix) {
+  const auto uut = lmadb::ast::parse_statement("insert into foo values (1, true)");
+  ast::sql_statement expected = ast::insert_into{"foo", {1ll, true}};
+
+  ASSERT_EQ(uut.value(), expected);
+}

@@ -1,26 +1,14 @@
 #include "cxx/adt/persistent_vector.hpp"
 
-#include "cxx/filesystem.hpp"
+#include "testlib/tmp_dir_fixture.hpp"
 
 #include <gtest/gtest.h>
 
 namespace cxx = lmadb::cxx;
 
-// TODO: put this into an internal test library.
-struct Fixture : public ::testing::Test {
-  cxx::filesystem::path tmpdir{cxx::filesystem::unique_path()};
+using lmadb::testlib::TmpDirFixture;
 
-  Fixture() {
-    cxx::filesystem::create_directories(tmpdir);
-    std::cout << "tmpdir = " << tmpdir << std::endl;
-  }
-
-  ~Fixture() {
-    cxx::filesystem::remove_all(tmpdir);
-  }
-};
-
-TEST_F(Fixture, CreateVector)
+TEST_F(TmpDirFixture, CreateVector)
 {
   const auto file = tmpdir / "badger.tbl";
 

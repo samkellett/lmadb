@@ -22,7 +22,13 @@ auto reader::describe_table(std::string_view table) const
 {
   using boost::adaptors::transformed;
 
-  const column_metadata_vector columns{db_ / fmt::format("{}.columns", table)};
+  const table_metadata_map tables{db_ / "db.tables"};
+  const auto it = tables.find(table);
+  if (it == std::end(tables)) {
+    throw table_exists_error{fmt::format("unknown table '{}'.", table)};
+  }
+
+  const column_metadata_vector columns{db_ / fmt::format("{}.columns", it->second.id)};
 
   auto desc = columns | transformed([](const auto &column) {
     return std::make_pair(column.name.string(), cxx::to_string_view(column.type));
@@ -59,7 +65,7 @@ auto reader::find_table(const std::string_view table) const -> table_desc
 
   return {
     it->second,
-    column_metadata_vector{db_ / fmt::format("{}.columns", table)}
+    column_metadata_vector{db_ / fmt::format("{}.columns", it->second.id)}
   };
 }
 

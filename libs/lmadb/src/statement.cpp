@@ -2,7 +2,7 @@
 
 #include "ast/parse_statement.hpp"
 
-// #include "storage/column/writer.hpp"
+#include "storage/column/insert.hpp"
 #include "storage/column/validate.hpp"
 
 #include "meta/reader.hpp"
@@ -40,12 +40,10 @@ public:
     // validate statement.
     storage::column::validate(insert_into, table_desc);
 
-    // // insert record.
-    // storage::column::insert(db_, insert_into);
+    // insert record.
+    storage::column::insert(db_, insert_into, table_desc);
 
-    // return step_status::done;
-
-    throw std::logic_error{"unimplemented."};
+    return step_status::done;
   }
 
 private:

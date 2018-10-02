@@ -1,4 +1,5 @@
 add_library(storage
+	src/insert.cpp
 	src/validate.cpp
 )
 
