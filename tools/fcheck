@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import argparse
 import os
@@ -17,7 +18,7 @@ from collections import namedtuple
 #    CHECK-NEXT - same as above but must come the line after the previous CHECK.
 #
 # Each directive is written as a comment, comment tokens supported:
-#    #, ;
+#    #, --
 #
 # The RUN command supports the following substitutions:
 #    %s - the full path of this file
@@ -26,7 +27,7 @@ from collections import namedtuple
 run = namedtuple('run', ['command'])
 check = namedtuple('check', ['test', 'next'])
 
-directive = re.compile(r"^\s*(?:#|;)\s*(RUN|CHECK|CHECK-NEXT):\s*(.*)\s*$")
+directive = re.compile(r"^\s*(?:#|--)\s*(RUN|CHECK|CHECK-NEXT):\s*(.*)\s*$")
 
 parser = argparse.ArgumentParser(description='LMADB command line test tool.')
 parser.add_argument('path', type=os.path.abspath, help='test file to run')
@@ -68,8 +69,7 @@ for r in runs:
 
         # if the next check is a CHECK-NEXT then this line must match, otherwise
         # we can ignore it.
-        m = current_check.test.match(line)
-        if m:
+        if current_check.test.match(line):
             # move onto the next check
             current_check = next(check_iter, None)
         elif current_check.next:

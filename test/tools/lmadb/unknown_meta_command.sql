@@ -1,4 +1,4 @@
-; RUN: lmadb -s %s
+-- RUN: lmadb -s %s
 
-; CHECK: Error: unknown meta command .unknown
-.unknown
+-- CHECK: Error: unknown meta command .unknown
+.unknown;
