@@ -42,9 +42,15 @@ struct insert_into {
   std::vector<expr> values;
 };
 
+struct select {
+  std::vector<column> columns;
+  table from;
+};
+
 using sql_statement = std::variant<
   create_table,
-  insert_into
+  insert_into,
+  select
 >;
 
 #define LMADB_DEFINE_EQ_OPS(ty)                                  \
@@ -58,6 +64,7 @@ using sql_statement = std::variant<
 LMADB_DEFINE_EQ_OPS(column_def)
 LMADB_DEFINE_EQ_OPS(create_table)
 LMADB_DEFINE_EQ_OPS(insert_into)
+LMADB_DEFINE_EQ_OPS(select)
 
 #undef LMADB_DEFINE_EQ_OPS
 

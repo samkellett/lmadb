@@ -29,7 +29,7 @@ public:
     return step_status::done;
   }
 
-  auto operator()([[maybe_unused]] const ast::insert_into &insert_into) -> step_status
+  auto operator()(const ast::insert_into &insert_into) -> step_status
   {
     // load metadata for table.
     const auto table_desc{[&] {
@@ -44,6 +44,11 @@ public:
     storage::column::insert(db_, insert_into, table_desc);
 
     return step_status::done;
+  }
+
+  auto operator()([[maybe_unused]] const ast::select &select) -> step_status
+  {
+    throw std::logic_error{"unimplemented."};
   }
 
 private:

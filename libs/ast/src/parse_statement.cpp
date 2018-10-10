@@ -15,7 +15,8 @@ constexpr auto table_name
 
 constexpr auto type_name
   = "int8"_ilit / to<ast::type::int64>
-  | "boolean"_ilit / to<ast::type::bool_>;
+  | "boolean"_ilit / to<ast::type::bool_>
+  ;
 
 constexpr auto column_def
   = (column_name > type_name) / construct<ast::column_def>;
@@ -41,9 +42,14 @@ constexpr auto insert_into_statement
   = ("insert"_ilit > "into"_ilit > table_name > "values"_ilit > "("_ilit > (expr % ","_lit) > ")"_lit)
   / construct<ast::insert_into>;
 
+constexpr auto select_statement
+  = ("select"_ilit > (column_name % ","_lit) > "from"_ilit > table_name)
+  / construct<ast::select>;
+
 constexpr auto sql_statement
   = create_table_statement
   | insert_into_statement
+  | select_statement
   ;
 
 } // namespace parser

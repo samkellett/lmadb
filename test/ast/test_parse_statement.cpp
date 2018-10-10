@@ -47,3 +47,10 @@ TEST(SqlStatement, InsertIntoMix) {
 
   ASSERT_EQ(uut.value(), expected);
 }
+
+TEST(SqlStatement, SelectColumns) {
+  const auto uut = lmadb::ast::parse_statement("select a, b from foo");
+  ast::sql_statement expected = ast::select{{"a", "b"}, "foo"};
+
+  ASSERT_EQ(uut.value(), expected);
+}

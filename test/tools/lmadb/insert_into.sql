@@ -9,3 +9,6 @@ insert into foo values(true, false);
 insert into foo values(1, 2);
 
 insert into foo values(1, true);
+
+-- CHECK: Error: unimplemented.
+select id, a from foo;
