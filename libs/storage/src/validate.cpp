@@ -36,7 +36,7 @@ auto check_expr_type(const ast::expr &expr, const std::size_t index) -> void
 
         // for now only support the exact type, in future we can add common types.
         if (!std::is_same_v<T, lit_value_type>) {
-          throw invalid_insert_into{fmt::format("unexpected type at index {}, expected {}.", index, type_str<T>())};
+          throw invalid_insert_into{"unexpected type at index {}, expected {}.", index, type_str<T>()};
         }
       }, x);
     } else {
@@ -57,10 +57,9 @@ auto validate(const ast::insert_into &insert_into,
   // check that all of the columns have a value to be inserted.
   // TODO: add support for non-null columns and the named tuple.
   if (insert_into.values.size() != table_desc.columns.size()) {
-    auto msg{fmt::format("expected {} values, got {}.",
-                         insert_into.values.size(),
-                         table_desc.columns.size())};
-    throw invalid_insert_into{std::move(msg)};
+    throw invalid_insert_into{"expected {} values, got {}.",
+                              insert_into.values.size(),
+                              table_desc.columns.size()};
   }
 
   // check each value is the correct type. TODO: zip iterator.

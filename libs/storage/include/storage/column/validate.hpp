@@ -1,8 +1,7 @@
 #ifndef LMADB_STORAGE_COLUMN_VALIDATE_HPP
 #define LMADB_STORAGE_COLUMN_VALIDATE_HPP
 
-#include <stdexcept>
-#include <string>
+#include "cxx/define_exception.hpp"
 
 namespace lmadb {
 
@@ -16,10 +15,7 @@ struct table_desc;
 
 namespace storage::column {
 
-class invalid_insert_into : public std::runtime_error {
-public:
-  invalid_insert_into(std::string what) : std::runtime_error{std::move(what)} {}
-};
+LMADB_DEFINE_EXCEPTION(invalid_insert_into);
 
 // validation routines for statements, throws on invalid combinations.
 auto validate(const ast::insert_into &insert_into, const meta::table_desc &table_desc)

@@ -22,7 +22,7 @@ auto writer::create_table(const ast::create_table &create_table) -> void
   table_id id(tables.size() + 1);
   auto [_, inserted] = tables.insert({table_name, {id}});
   if (!inserted) {
-    throw table_exists_error{fmt::format("cannot insert table '{}', already exists.", table_name)};
+    throw table_exists_error{"cannot insert table '{}', already exists.", table_name};
   }
 
   try {
@@ -36,7 +36,7 @@ auto writer::create_table(const ast::create_table &create_table) -> void
         return c.name == column.name;
       });
       if (it != std::end(columns)) {
-        throw column_exists_error{fmt::format("cannot create table, column '{}' is not unique.", column.name)};
+        throw column_exists_error{"cannot create table, column '{}' is not unique.", column.name};
       }
 
       columns.push_back({column.name, column.type});

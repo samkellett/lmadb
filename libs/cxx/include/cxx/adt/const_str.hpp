@@ -38,7 +38,7 @@ const_str<N>::const_str(const std::string_view str)
 : data_{}
 {
   if (str.size() > N) {
-    throw std::runtime_error{fmt::format("String '{}' too large to fit.")};
+    throw std::runtime_error{fmt::format("String '{}' too large to fit.", str)};
   }
 
   std::copy(std::begin(str), std::begin(str) + std::min(str.size(), N), std::begin(data_));

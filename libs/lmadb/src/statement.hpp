@@ -1,6 +1,7 @@
 #ifndef LMADB_STATEMENT_HPP
 #define LMADB_STATEMENT_HPP
 
+#include "cxx/define_exception.hpp"
 #include "cxx/filesystem.hpp"
 
 #include "ast/ast.hpp"
@@ -11,10 +12,7 @@
 
 namespace lmadb {
 
-class invalid_sql_error : public std::runtime_error {
-public:
-  invalid_sql_error(std::string what) : std::runtime_error{std::move(what)} {}
-};
+LMADB_DEFINE_EXCEPTION(invalid_sql_error);
 
 enum class step_status : bool {
   row,

@@ -5,13 +5,11 @@
 
 #include "cxx/adt/const_str.hpp"
 #include "cxx/adt/persistent_vector.hpp"
+#include "cxx/define_exception.hpp"
 
 namespace lmadb::meta {
 
-class column_exists_error : public std::runtime_error {
-public:
-  column_exists_error(std::string what) : std::runtime_error{std::move(what)} {}
-};
+LMADB_DEFINE_EXCEPTION(column_exists_error);
 
 // TODO: make these newtypes.
 using column_name = cxx::const_str<64>;

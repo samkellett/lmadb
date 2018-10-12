@@ -25,7 +25,7 @@ auto reader::describe_table(std::string_view table) const
   const table_metadata_map tables{db_ / "db.tables"};
   const auto it = tables.find(table);
   if (it == std::end(tables)) {
-    throw table_exists_error{fmt::format("unknown table '{}'.", table)};
+    throw table_exists_error{"unknown table '{}'.", table};
   }
 
   const column_metadata_vector columns{db_ / fmt::format("{}.columns", it->second.id)};
@@ -60,7 +60,7 @@ auto reader::find_table(const std::string_view table) const -> table_desc
   const table_metadata_map tables{db_ / "db.tables"};
   const auto it = tables.find(table);
   if (it == std::end(tables)) {
-    throw table_exists_error{fmt::format("unknown table '{}'.", table)};
+    throw table_exists_error{"unknown table '{}'.", table};
   }
 
   return {

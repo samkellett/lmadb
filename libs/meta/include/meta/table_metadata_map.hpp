@@ -3,13 +3,11 @@
 
 #include "cxx/adt/const_str.hpp"
 #include "cxx/adt/persistent_flat_map.hpp"
+#include "cxx/define_exception.hpp"
 
 namespace lmadb::meta {
 
-class table_exists_error : public std::runtime_error {
-public:
-  table_exists_error(std::string what) : std::runtime_error{std::move(what)} {}
-};
+LMADB_DEFINE_EXCEPTION(table_exists_error);
 
 // TODO: make these newtypes.
 using table_id = std::uint32_t;

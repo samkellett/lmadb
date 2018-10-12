@@ -8,8 +8,6 @@
 #include "meta/reader.hpp"
 #include "meta/writer.hpp"
 
-#include <fmt/format.h>
-
 namespace lmadb {
 
 namespace {
@@ -69,7 +67,7 @@ statement::statement(const cxx::filesystem::path &db,
   if (auto stmt = ast::parse_statement(query_string_)) {
     stmt_ = *std::move(stmt);
   } else {
-    throw invalid_sql_error{fmt::format("invalid SQL: '{}'.", query_string_)};
+    throw invalid_sql_error{"invalid SQL: '{}'.", query_string_};
   }
 }
 
