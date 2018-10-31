@@ -4,7 +4,7 @@
 #include "cxx/define_exception.hpp"
 #include "cxx/filesystem.hpp"
 
-#include "ast/ast.hpp"
+#include <cppcoro/generator.hpp>
 
 #include <functional>
 #include <string>
@@ -14,29 +14,22 @@ namespace lmadb {
 
 LMADB_DEFINE_EXCEPTION(invalid_sql_error);
 
-enum class step_status : bool {
-  row,
-  done
-};
+// a statement frame contains the coroutine that will generate rows and stays alive for the
+// duration of the query.
+struct statement {
+  // TODO: for now we don't support returning data.
+  using generator = cppcoro::generator<void *>;
 
-class statement {
-public:
-  statement(const cxx::filesystem::path &db,
-            std::string_view sql,
-            std::function<void(std::string_view)> set_error_callback);
+  statement(const cxx::filesystem::path &db, std::string_view sql, std::string &error);
 
-  auto step() -> step_status;
-
-  auto set_error(std::string_view msg) -> void;
-
-private:
-  const cxx::filesystem::path &db_;
-
-  std::string query_string_;
-  ast::sql_statement stmt_;
-
-  // TODO: make this a small_function
-  std::function<void(std::string_view)> set_error_callback_;
+  // take a copy of the query string as we cannot gurantee lifetime of the the one given.
+  std::string sql;
+  // the top-level coroutine that will produce any data produced by the query.
+  generator row;
+  // whee we currently are.
+  generator::iterator it;
+  // a buffer owned by the connection for exposing error messages through the public api.
+  std::string &error;
 };
 
 } // namespace lmadb

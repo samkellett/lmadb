@@ -24,7 +24,9 @@
   do {                                                                  \
     lmadb_rc rc = fn;                                                   \
     if (rc != expected) {                                               \
-      printf("line %d: api call %s returned %d.\n", __LINE__, #fn, rc); \
+      printf("line %d: api call %s expected %s (%d), got %s (%d).\n",   \
+             __LINE__, #fn, lmadb_errstr(expected), expected,           \
+             lmadb_errstr(rc), rc);                                     \
       pass = false;                                                     \
       goto cleanup;                                                     \
     }                                                                   \
@@ -42,12 +44,18 @@ int main()
 {
   bool pass = true;
 
+  // declare all variables that could be cleaned up at any point.
   lmadb_connection *conn = NULL;
   lmadb_stmt *stmt = NULL;
   lmadb_table_list *tables = NULL;
   lmadb_table_desc *table_desc = NULL;
 
   const char *sql = NULL;
+
+  // don't bother testing all the rc text representations, just make sure
+  // that the api method works (and do it before any CHECK_API_CALL as that
+  // macro uses this function).
+  CHECK(strcmp(lmadb_errstr(LMADB_OK), "LMADB_OK") == 0);
 
   // first of all check we can safely close an objects that don't exist.
   CHECK_API_CALL(lmadb_close(conn));
@@ -93,7 +101,12 @@ int main()
   CHECK_API_CALL(lmadb_prepare(conn, sql, strlen(sql), &stmt));
   CHECK(stmt != NULL);
 
-  // now execute (but change the query string first to check it has been copied)!
+  // make sure our table doesn't exist until we call step.
+  CHECK_API_CALL(lmadb_list_tables(conn, &tables));
+  CHECK(tables != NULL);
+  CHECK(tables->size == 0);
+
+  // now execute (but clear the query string first to check it has been copied!)
   sql = NULL;
   CHECK_API_CALL_RC(lmadb_step(stmt), LMADB_DONE);
   CHECK_API_CALL(lmadb_finalize(stmt));

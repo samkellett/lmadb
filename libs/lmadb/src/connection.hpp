@@ -7,7 +7,7 @@
 
 namespace lmadb {
 
-class statement;
+struct statement;
 
 class connection {
 public:

@@ -51,6 +51,9 @@ lmadb_rc lmadb_step(lmadb_stmt *stmt);
 // value will change.
 const char *lmadb_errmsg(lmadb_connection *conn);
 
+// English-language text that describes the error code.
+const char *lmadb_errstr(lmadb_rc err);
+
 // These API methods are a tempoary way to query the structure of the database
 // and the tables inside it. Eventually these will be removed and this
 // functionality will be available via the prepare/step interface.

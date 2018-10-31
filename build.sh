@@ -70,7 +70,7 @@ cmake "$PROJECT_DIR" \
 	-DCMAKE_CXX_COMPILER=clang++ \
 	-DCMAKE_C_COMPILER=clang
 
-ninja
+ninja -k0
 pip install $BUILD_DIR/libs/pylmadb
 
 if [[ $TESTS == 1 ]]; then

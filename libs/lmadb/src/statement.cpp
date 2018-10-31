@@ -12,22 +12,23 @@ namespace lmadb {
 
 namespace {
 
-class step_visitor {
+class statement_visitor {
 public:
-  explicit step_visitor(const cxx::filesystem::path &db)
+  explicit statement_visitor(const cxx::filesystem::path &db)
   : db_{db}
   {
   }
 
-  auto operator()(const ast::create_table &create_table) -> step_status
+  auto operator()(const ast::create_table &create_table) const -> statement::generator
   {
     meta::writer md{db_};
     md.create_table(create_table);
 
-    return step_status::done;
+    // we're done with nothing to return.
+    co_yield nullptr;
   }
 
-  auto operator()(const ast::insert_into &insert_into) -> step_status
+  auto operator()(const ast::insert_into &insert_into) const -> statement::generator
   {
     // load metadata for table.
     const auto table_desc{[&] {
@@ -41,10 +42,11 @@ public:
     // insert record.
     storage::column::insert(db_, insert_into, table_desc);
 
-    return step_status::done;
+    // we're done with nothing to return.
+    co_yield nullptr;
   }
 
-  auto operator()([[maybe_unused]] const ast::select &select) -> step_status
+  auto operator()([[maybe_unused]] const ast::select &select) const -> statement::generator
   {
     throw std::logic_error{"unimplemented."};
   }
@@ -53,32 +55,27 @@ private:
   const cxx::filesystem::path &db_;
 };
 
-} // unnamed namespace
-
-statement::statement(const cxx::filesystem::path &db,
-                     std::string_view sql,
-                     std::function<void(std::string_view)> set_error_callback)
-: db_{db},
-  query_string_{sql},
-  stmt_{},
-  set_error_callback_{std::move(set_error_callback)}
+auto make_statement(const cxx::filesystem::path &db, const std::string_view sql)
+  -> statement::generator
 {
-  // TODO: better error handling when parsing fails.
-  if (auto stmt = ast::parse_statement(query_string_)) {
-    stmt_ = *std::move(stmt);
+  if (auto stmt = ast::parse_statement(sql)) {
+    // create a coroutine that will yield every row this query returns (if any).
+    return std::visit(statement_visitor{db}, *stmt);
   } else {
-    throw invalid_sql_error{"invalid SQL: '{}'.", query_string_};
+    // TODO: better error handling when parsing fails.
+    throw invalid_sql_error{"invalid SQL: '{}'.", sql};
   }
 }
 
-auto statement::step() -> step_status
-{
-  return std::visit(step_visitor{db_}, stmt_);
-}
+} // unnamed namespace
 
-auto statement::set_error(const std::string_view error) -> void
+statement::statement(const cxx::filesystem::path &db, std::string_view sql_, std::string &error_)
+: sql{std::move(sql_)},
+  row{make_statement(db, sql)},
+  // the coroutine remains unstarted until begin is called on the first call to lmadb_step.
+  it{std::end(row)},
+  error{error_}
 {
-  set_error_callback_(error);
 }
 
 } // namespace lmadb

@@ -63,15 +63,29 @@ auto lmadb_step(lmadb_stmt *stmt) -> lmadb_rc
 
   auto &statement{*reinterpret_cast<lmadb::statement *>(stmt)};
   try {
-    using lmadb::step_status;
+    // if the statement iterator is finished then we haven't begun yet. because of this 
+    // it is invalid to call lmadb_step with an aleady exhausted coroutine.
+    const auto end{std::end(statement.row)};
+    if (statement.it == end) {
+      // begin the coroutine.
+      statement.it = std::begin(statement.row);
+    }
 
-    switch(statement.step()) {
-      case step_status::row: return LMADB_ROW;
-      case step_status::done: return LMADB_DONE;
+    // continue until we get a value back.
+    // TODO: make our own coroutine type that means we don't have to do this.
+    while (statement.it != end && *statement.it == nullptr) {
+      ++statement.it;
+    }
+
+    // have we finished now?
+    if (statement.it == end) {
+      return LMADB_DONE;
+    } else {
+      return LMADB_ROW;
     }
   } catch(const std::exception &e) {
     // TODO: use our own exception types.
-    statement.set_error(e.what());
+    statement.error = e.what();
     return LMADB_ERROR;
   }
 }
@@ -80,6 +94,16 @@ auto lmadb_errmsg(lmadb_connection *conn) -> const char *
 {
   auto &connection{*reinterpret_cast<lmadb::connection *>(conn)};
   return connection.error().c_str();
+}
+
+auto lmadb_errstr(lmadb_rc err) -> const char *
+{
+  switch(err) {
+    case LMADB_OK: return "LMADB_OK";
+    case LMADB_ERROR: return "LMADB_ERROR";
+    case LMADB_DONE: return "LMADB_DONE";
+    case LMADB_ROW: return "LMADB_ROW";
+  }
 }
 
 auto lmadb_list_tables(lmadb_connection *conn, lmadb_table_list **table_list)

@@ -10,8 +10,7 @@ enable_testing()
 set(LMADB_STD_CXX -std=c++17)
 
 # in-tree dependencies
-add_subdirectory(ext/fmt EXCLUDE_FROM_ALL)
-add_subdirectory(ext/googletest EXCLUDE_FROM_ALL)
+add_subdirectory(ext)
 
 set(PYBIND11_CPP_STANDARD ${LMADB_STD_CXX})
 add_subdirectory(ext/pybind11 EXCLUDE_FROM_ALL)
@@ -20,6 +19,7 @@ add_subdirectory(ext/pybind11 EXCLUDE_FROM_ALL)
 set(LMADB_CXX_OPTIONS ${LMADB_STD_CXX} -stdlib=libc++)
 add_compile_options(
 	"$<$<COMPILE_LANGUAGE:CXX>:${LMADB_CXX_OPTIONS}>"
+	-fcoroutines-ts
 	-fcolor-diagnostics
 	# TODO: see if this can be enabled.
 	# -Wl,--fatal-warnings

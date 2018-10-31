@@ -20,9 +20,7 @@ connection::connection(cxx::filesystem::path path) noexcept
 auto connection::create_statement(std::string_view sql)
   -> std::unique_ptr<statement>
 {
-  return std::make_unique<statement>(path_, std::move(sql), [this](const std::string_view error) {
-    set_error(error);
-  });
+  return std::make_unique<statement>(path_, std::move(sql), error_);
 }
 
 auto connection::list_tables() const -> std::vector<std::string>

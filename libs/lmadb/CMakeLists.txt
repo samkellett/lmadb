@@ -12,6 +12,7 @@ target_link_libraries(lmadb
 		lmadb::cxx
 		lmadb::meta
 		lmadb::storage
+		cppcoro::cppcoro
 		fmt::fmt
 )
 
